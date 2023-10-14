@@ -1,0 +1,96 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Profile {
+  // Profile Details
+  id       String @id @default(dbgenerated("concat('prf_', replace(cast(gen_random_uuid() as text),'-', ''))")) @db.Text
+  userId   String @unique
+  name     String
+  imageUrl String @db.Text
+  email    String @db.Text
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Server relation to  profile
+  servers  Server[]
+  // Member relation to profile
+  members  Member[]
+  //  channel relation to a profile
+  channels Channel[]
+}
+
+model Server {
+  // Server Details
+  id         String @id @default(dbgenerated("concat('srv_', replace(cast(gen_random_uuid() as text),'-', ''))")) @db.Text
+  name       String
+  imageUrl   String @db.Text
+  inviteCode String @db.Text
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Profile Relation to server
+  profileId String
+  profile   Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  // Members relation to a server
+  members  Member[]
+  // Channel relation to a server
+  channels Channel[]
+}
+
+enum MemberRole {
+  ADMIN
+  MODERATOR
+  GUEST
+}
+
+model Member {
+  id   String     @id @default(dbgenerated("concat('mbr_', replace(cast(gen_random_uuid() as text),'-', ''))")) @db.Text
+  role MemberRole @default(GUEST)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Profile relation to memeber
+  profileId String
+  profile   Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  serverId String
+  server   Server @relation(fields: [serverId], references: [id], onDelete: Cascade)
+
+  @@index([profileId])
+  @@index([serverId])
+}
+
+enum ChannelType {
+  TEXT
+  VIDEO
+  AUDIO
+}
+
+model Channel {
+  id   String      @id @default(dbgenerated("concat('chl_', replace(cast(gen_random_uuid() as text),'-', ''))")) @db.Text
+  type ChannelType @default(TEXT)
+  name String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // relation to profile
+  profileId String
+  profile   Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  // relation to server
+  serverId  String
+  server    Server  @relation(fields: [serverId], references: [id], onDelete: Cascade)
+
+  @@index([profileId])
+  @@index([serverId])
+}
