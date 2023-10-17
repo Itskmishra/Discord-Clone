@@ -16,6 +16,7 @@ const InviteCodePage = async ({ params }: InviteCodePageProps) => {
   if (!profile) {
     return redirectToSignIn();
   }
+
   // If params is not there then return it to home page.
   if (!params.inviteCode) {
     return redirect("/");
@@ -32,6 +33,7 @@ const InviteCodePage = async ({ params }: InviteCodePageProps) => {
       },
     },
   });
+  
   // IF user exists return it to the server homepage.
   if (existingServer) {
     return redirect(`/servers/${existingServer.id}`);
@@ -53,6 +55,10 @@ const InviteCodePage = async ({ params }: InviteCodePageProps) => {
     },
   });
 
-  return <div>InviteCodePage</div>;
+  if (server) {
+    return redirect(`/servers/${server.id}`);
+  }
+
+  return null;
 };
 export default InviteCodePage;

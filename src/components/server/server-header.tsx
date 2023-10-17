@@ -1,15 +1,5 @@
 "use client";
 
-import { MemberRole } from "@prisma/client";
-
-import { ServerWithMembersWithProfile } from "../../../types";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "../ui/dropdown-menu";
 import {
   ChevronDown,
   LogOut,
@@ -19,7 +9,16 @@ import {
   UserPlus,
   Users,
 } from "lucide-react";
+import { ServerWithMembersWithProfile } from "../../../types";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "../ui/dropdown-menu";
 import { useModal } from "@/hooks/use-modal-store";
+import { MemberRole } from "@prisma/client";
 
 interface ServerHeaderProps {
   server: ServerWithMembersWithProfile;
@@ -30,9 +29,11 @@ const ServerHeader: React.FC<ServerHeaderProps> = ({
   server,
   role,
 }: ServerHeaderProps) => {
+  // Roles
   const isAdmin = role === MemberRole.ADMIN;
-  const { onOpen } = useModal();
   const isModerator = isAdmin || role === MemberRole.MODERATOR;
+  // Modal Context to open modal
+  const { onOpen } = useModal();
 
   return (
     <DropdownMenu>
@@ -58,7 +59,10 @@ const ServerHeader: React.FC<ServerHeaderProps> = ({
         )}
         {/* For Admin only settings */}
         {isAdmin && (
-          <DropdownMenuItem className="px-3 py-2 text-sm cursor-pointer">
+          <DropdownMenuItem
+            className="px-3 py-2 text-sm cursor-pointer"
+            onClick={() => onOpen("editServer", { server })}
+          >
             Server Settings
             <Settings className="h-4 w-4 ml-auto" />
           </DropdownMenuItem>
