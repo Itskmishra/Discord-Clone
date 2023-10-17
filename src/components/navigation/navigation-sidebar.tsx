@@ -48,6 +48,7 @@ const NavigationSidebar: React.FC<NavigationSidebarProps> = async () => {
           </div>
         ))}
       </ScrollArea>
+      {/* user and theme button. */}
       <div className="pb-3 mt-auto flex items-center flex-col gap-y-4">
         <ModeToggle />
         <UserButton

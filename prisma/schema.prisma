@@ -31,7 +31,7 @@ model Server {
   id         String @id @default(dbgenerated("concat('srv_', replace(cast(gen_random_uuid() as text),'-', ''))")) @db.Text
   name       String
   imageUrl   String @db.Text
-  inviteCode String @db.Text
+  inviteCode String @unique
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
