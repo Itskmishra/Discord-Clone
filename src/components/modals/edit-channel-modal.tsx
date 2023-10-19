@@ -32,11 +32,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useParams } from "next/navigation";
 import { useEffect } from "react";
 
 // Interface for the Page
-interface CreateChannelModalProps {}
+interface EditChannelModalProps {}
 
 // Schema for the form
 const formSchema = z.object({
@@ -52,45 +51,44 @@ const formSchema = z.object({
 });
 
 // Main function
-const CreateChannelModal: React.FC<CreateChannelModalProps> = () => {
+const EditChannelModal: React.FC<EditChannelModalProps> = () => {
   const { isOpen, onClose, type, data } = useModal();
-  const isModalOpen = isOpen && type === "createChannel";
-  const { channelType } = data;
+  const isModalOpen = isOpen && type === "editChannel";
+  const { channel, server } = data;
 
   // Router for page manipulation
   const router = useRouter();
-  const params = useParams();
 
   // useForm
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
-      type: channelType || ChannelType.TEXT,
+      type: channel?.type || ChannelType.TEXT,
     },
   });
+
   // Useffect to set the value to the channel type.
   useEffect(() => {
-    if (channelType) {
-      form.setValue("type", channelType);
-    } else {
-      form.setValue("type", ChannelType.TEXT);
+    if (channel) {
+      form.setValue("type", channel.type);
+      form.setValue("name", channel.name);
     }
-  }, [form, channelType]);
+  }, [form, channel]);
 
   // Destructring loading state from useFrom
   const isLoading = form.formState.isSubmitting;
 
-  // Form subimt funciton
+  // Form subimt function
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
       const url = qs.stringifyUrl({
-        url: `/api/channels`,
+        url: `/api/channels/${channel?.id}`,
         query: {
-          serverId: params?.serverId,
+          serverId: server?.id,
         },
       });
-      await axios.post(url, values);
+      await axios.patch(url, values);
       form.reset();
       router.refresh();
       onClose();
@@ -111,7 +109,7 @@ const CreateChannelModal: React.FC<CreateChannelModalProps> = () => {
         {/* Modal title */}
         <DialogHeader className="pt-8 px-6">
           <DialogTitle className="text-2xl text-center font-bold">
-            Create Channel
+            Edit Channel
           </DialogTitle>
         </DialogHeader>
         {/* Form  */}
@@ -180,7 +178,7 @@ const CreateChannelModal: React.FC<CreateChannelModalProps> = () => {
             {/* Submit button */}
             <DialogFooter className="bg-gray-100 px-6 py-4">
               <Button disabled={isLoading} variant={"primary"}>
-                Create
+                Save
               </Button>
             </DialogFooter>
           </form>
@@ -189,4 +187,4 @@ const CreateChannelModal: React.FC<CreateChannelModalProps> = () => {
     </Dialog>
   );
 };
-export default CreateChannelModal;
+export default EditChannelModal;

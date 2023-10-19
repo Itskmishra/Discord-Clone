@@ -14,28 +14,35 @@ import { useModal } from "@/hooks/use-modal-store";
 
 import { Button } from "../ui/button";
 import { useRouter } from "next/navigation";
+import qs from "query-string";
 
 // Interface for the Page
-interface DeleteServerProps {}
+interface DeleteChannelProps {}
 
 // Main function
-const DeleteServer: React.FC<DeleteServerProps> = () => {
+const DeleteChannel: React.FC<DeleteChannelProps> = () => {
   const router = useRouter();
 
   // get values from context
   const { isOpen, onClose, type, data, onOpen } = useModal();
-  const isModalOpen = isOpen && type === "deleteServer";
+  const isModalOpen = isOpen && type === "deleteChannel";
 
-  const { server } = data;
+  const { server, channel } = data;
   const [loading, setLoading] = useState(false);
 
-  const handleDeleteServer = async () => {
+  const handleDeleteChannel = async () => {
     try {
       setLoading(true);
-      await axios.delete(`/api/servers/${server?.id}`);
+      const url = qs.stringifyUrl({
+        url: `/api/channels/${channel?.id}`,
+        query: {
+          serverId: server?.id,
+        },
+      });
+      await axios.delete(url);
       onClose();
       router.refresh();
-      router.push('/')
+      router.push(`/servers/${server?.id}`);
     } catch (error) {
       console.log(error);
     } finally {
@@ -49,12 +56,12 @@ const DeleteServer: React.FC<DeleteServerProps> = () => {
         {/* Modal title */}
         <DialogHeader className="pt-8 px-6">
           <DialogTitle className="text-2xl text-center font-bold">
-            Delete Server
+            Delete Channel
           </DialogTitle>
           <DialogDescription className="text-zinc-500">
-            Are you sure you want to delete this server ? <br />
+            Are you sure you want to delete this channel ? <br />
             <span className="font-semibold text-indigo-500">
-              {server?.name}
+              #{channel?.name}
             </span>{" "}
             will be permanently deleted and all the data will be lost.
           </DialogDescription>
@@ -71,7 +78,7 @@ const DeleteServer: React.FC<DeleteServerProps> = () => {
             <Button
               disabled={loading}
               variant={"primary"}
-              onClick={handleDeleteServer}
+              onClick={handleDeleteChannel}
             >
               Confirm
             </Button>
@@ -81,4 +88,4 @@ const DeleteServer: React.FC<DeleteServerProps> = () => {
     </Dialog>
   );
 };
-export default DeleteServer;
+export default DeleteChannel;
