@@ -76,6 +76,7 @@ const ChannelIdPage: React.FC<ChannelIdPageProps> = async ({ params }) => {
           chatId={channel.id}
           video={false}
           audio={true}
+          name={profile.name}
         />
       )}
       {channel.type === ChannelType.VIDEO && (
@@ -83,6 +84,7 @@ const ChannelIdPage: React.FC<ChannelIdPageProps> = async ({ params }) => {
           chatId={channel.id}
           video={true}
           audio={true}
+          name={profile.name}
         />
       )}
     </div>

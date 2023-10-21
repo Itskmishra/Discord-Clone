@@ -65,7 +65,12 @@ const MemberIdPage: React.FC<MemberIdPageProps> = async ({
       />
       {/* Video call  */}
       {searchParams.video && (
-        <MediaRoom chatId={conversation.id} video={true} audio={true} />
+        <MediaRoom
+          chatId={conversation.id}
+          video={true}
+          audio={true}
+          name={profile.name}
+        />
       )}
       {!searchParams.video && (
         <>

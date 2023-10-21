@@ -3,28 +3,27 @@
 import { useEffect, useState } from "react";
 import { LiveKitRoom, VideoConference } from "@livekit/components-react";
 import "@livekit/components-styles";
-import { Channel } from "@prisma/client";
-import { useUser } from "@clerk/nextjs";
 import { Loader2 } from "lucide-react";
 
 interface MediaRoomProps {
   chatId: string;
   video: boolean;
   audio: boolean;
+  name: string
 }
 
-export const MediaRoom = ({ chatId, video, audio }: MediaRoomProps) => {
-  // Get user
-  const { user } = useUser();
+export const MediaRoom = ({
+  chatId,
+  video,
+  audio,
+  name,
+}: MediaRoomProps) => {
   const [token, setToken] = useState("");
 
-  // Fetch token and create room
   useEffect(() => {
-    if (!user?.firstName || !user?.lastName) return;
-    const name = `${user.firstName} ${user.lastName}`;
+    if (!name) return;
     (async () => {
       try {
-        console.log(user);
         const resp = await fetch(
           `/api/livekit?room=${chatId}&username=${name}`
         );
@@ -34,7 +33,8 @@ export const MediaRoom = ({ chatId, video, audio }: MediaRoomProps) => {
         console.log(e);
       }
     })();
-  }, [user?.firstName, user?.lastName, chatId]);
+  }, [name, chatId]);
+
   // if token is empty then show a loader
   if (token === "") {
     return (
