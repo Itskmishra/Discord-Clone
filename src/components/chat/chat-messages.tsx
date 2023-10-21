@@ -8,6 +8,7 @@ import { format } from "date-fns";
 import { Fragment, useRef, ElementRef } from "react";
 import ChatItem from "./chat-item";
 import { useChatSocket } from "@/hooks/use-chat-socket";
+import { useChatScroll } from "@/hooks/use-chat-scroll";
 
 // Date format
 const DATE_FORMAT = "d MMM yyyy, HH:mm";
@@ -54,8 +55,16 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
   // Using react-query
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, status } =
     useChatQuery({ queryKey, apiUrl, paramKey, paramValue });
-  // Socket use
+  // Socket hook
   useChatSocket({ queryKey, addKey, updateKey });
+  // scroll hook
+  useChatScroll({
+    chatRef,
+    bottomRef,
+    loadMore: fetchNextPage,
+    shouldLoadMore: !isFetchingNextPage && !!hasNextPage,
+    count: data?.pages?.[0]?.items?.length ?? 0,
+  });
 
   // Status loading
   if (status === "pending") {
@@ -82,16 +91,21 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
 
   return (
     <div className="flex-1 flex flex-col py-4 overflow-y-auto" ref={chatRef}>
-      {!hasNextPage && (<div className="flex-1" />)}
+      {!hasNextPage && <div className="flex-1" />}
       {/* Welcome Message */}
-      {!hasNextPage && (<ChatWelcome type={type} name={name} />)}
+      {!hasNextPage && <ChatWelcome type={type} name={name} />}
       {/* Messages */}
       {hasNextPage && (
         <div className="flex justify-center items-center">
           {isFetchingNextPage ? (
             <Loader2 className="h-6 w-6 text-zinc-500 animate-spin my-4" />
           ) : (
-            <button className="text-zinc-500 hover:text-zinc-600 dark:text-zinc-400 dark:hover:text-zinc-300 my-4 text-xs" onClick={() => fetchNextPage()}>Load previouse messages</button>
+            <button
+              className="text-zinc-500 hover:text-zinc-600 dark:text-zinc-400 dark:hover:text-zinc-300 my-4 text-xs"
+              onClick={() => fetchNextPage()}
+            >
+              Load previouse messages
+            </button>
           )}
         </div>
       )}
